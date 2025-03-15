@@ -1,4 +1,10 @@
 package pe.edu.idat.EC3_FloresRoman.model;
 
-public class Usuario {
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "country")
+public class Country {
+
 }

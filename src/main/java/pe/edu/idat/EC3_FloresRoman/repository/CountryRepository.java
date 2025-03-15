@@ -1,4 +1,4 @@
 package pe.edu.idat.EC3_FloresRoman.repository;
 
-public interface UsuarioRepository {
+public interface CountryRepository {
 }
