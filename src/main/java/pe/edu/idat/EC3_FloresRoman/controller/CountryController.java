@@ -1,9 +1,11 @@
 package pe.edu.idat.EC3_FloresRoman.controller;
 
 
+import org.codehaus.plexus.resource.loader.ResourceNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import pe.edu.idat.EC3_FloresRoman.model.Country;
 import pe.edu.idat.EC3_FloresRoman.service.CountryService;
 
 import java.util.List;
@@ -15,49 +17,57 @@ public class CountryController {
     public CountryController(CountryService countryService) {this.countryService = countryService;}
 
     @GetMapping
-    public ResponseEntity<GenericResponseDto<List<???>>>
-    obtenerPais(){
-        List<??> countryDtoList =
-                countryService.obtenerPaisesDto();
-        GenericResponseDto<List<???>> response
-                = new GenericResponseDto<>();
-        response.setCorrecto(true);
-        response.setMensaje("Lista de paises");
-        response.setRespuesta(countryDtoList);
-        return new ResponseEntity<>(response,
+    public ResponseEntity<List<Country>> listarPaises(){
+        List<Country> countryList
+                = countryService
+                .listarCountry();
+        if(countryList.isEmpty()){
+            return new ResponseEntity<>(
+                    HttpStatus.NO_CONTENT);
+        }
+        return new ResponseEntity<>(countryList,
                 HttpStatus.OK);
     }
-
-    @PostMapping
-    public ResponseEntity<GenericResponseDto<String>>
-    registrarPaises(@RequestBody CountryRegisterDto countryRegisterDto){
-        GenericResponseDto<String> response = new GenericResponseDto<>();
-        try{
-            countryService.registrarPaises(countryRegisterDto);
-            response.setCorrecto(true);
-            response.setMensaje("Pais registrado exitosamente");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (Exception e) {
-            response.setCorrecto(false);
-            response.setMensajeError(e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @GetMapping("/{code}")
+    public ResponseEntity<Country> obtenerPais(
+            @PathVariable String Code){
+        Country country = countryService
+                .obtenerCountryXid(Code)
+                .orElseThrow(() -> new ResourceNotFoundException("Pais buscado no existe"));
+        return new ResponseEntity<>(country, HttpStatus.OK);
     }
-
-    @PatchMapping
-    public ResponseEntity<GenericResponseDto<String>>
-    actualizarPaises(@RequestBody CountryRegisterDto countryRegisterDto){
-        GenericResponseDto<String> response = new GenericResponseDto<>();
-        try{
-            countryService.actualizarPaises(countryRegisterDto);
-            response.setCorrecto(true);
-            response.setMensaje("Pais actualizado exitosamente");
-            return new ResponseEntity<>(response, HttpStatus.CREATED);
-        } catch (Exception e) {
-            response.setCorrecto(false);
-            response.setMensajeError(e.getMessage());
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+    @PostMapping
+    public ResponseEntity<Country> registrarPais(
+            @RequestBody Country country){
+        return new ResponseEntity<>(
+                countryService.guardarCountry(country),
+                HttpStatus.CREATED);
+    }
+    @PutMapping("/{id}")
+    public ResponseEntity<Country> actualizarPais(
+            @PathVariable String Code,
+            @RequestBody Country country){
+        Country currentCountry = countryService
+                .obtenerCountryXid(Code)
+                .orElseThrow(() -> new ResourceNotFoundException(
+                        "Pais buscado no existe"));
+        currentCountry.setName(country.getName());
+        currentCountry.setContinent(country.getContinent());
+        currentCountry.setRegion(country.getRegion());
+        currentCountry.setSurfaceArea(country.getSurfaceArea());
+        currentCountry.setIndepYear(country.getIndepYear());
+        currentCountry.setPopulation(country.getPopulation());
+        currentCountry.setLifeExpectancy(country.getLifeExpectancy());
+        currentCountry.setGNP(country.getGNP());
+        currentCountry.setGNPOId(country.getGNPOId());
+        currentCountry.setLocalName(country.getLocalName());
+        currentCountry.setGovernmentForm(country.getGovernmentForm());
+        currentCountry.setHeadOfState(country.getHeadOfState());
+        currentCountry.setCapital(country.getCapital());
+        currentCountry.setCode2(country.getCode2());
+        return new ResponseEntity<>(
+                countryService.guardarCountry(currentCountry),
+                HttpStatus.OK);
     }
 
 }
