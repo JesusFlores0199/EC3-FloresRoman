@@ -6,5 +6,5 @@ import jakarta.persistence.Table;
 @Entity
 @Table(name = "country")
 public class Country {
-
+  private Integer ID;
 }
