@@ -6,7 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.edu.idat.EC3_FloresRoman.model.Country;
-import pe.edu.idat.EC3_FloresRoman.service.CountryService;
+import pe.edu.idat.EC3_FloresRoman.service.impl.CountryService;
 
 import java.util.List;
 
@@ -30,7 +30,7 @@ public class CountryController {
     }
     @GetMapping("/{code}")
     public ResponseEntity<Country> obtenerPais(
-            @PathVariable String Code){
+            @PathVariable String Code) throws ResourceNotFoundException {
         Country country = countryService
                 .obtenerCountryXid(Code)
                 .orElseThrow(() -> new ResourceNotFoundException("Pais buscado no existe"));
@@ -46,7 +46,7 @@ public class CountryController {
     @PutMapping("/{id}")
     public ResponseEntity<Country> actualizarPais(
             @PathVariable String Code,
-            @RequestBody Country country){
+            @RequestBody Country country) throws ResourceNotFoundException {
         Country currentCountry = countryService
                 .obtenerCountryXid(Code)
                 .orElseThrow(() -> new ResourceNotFoundException(
